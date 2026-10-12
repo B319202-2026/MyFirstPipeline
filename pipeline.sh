@@ -19,3 +19,21 @@ do
 done
 
 echo "FastQC complete."
+
+
+# Task2
+echo "Summarizing QC data"
+
+SUMMARY_FILE="results/fastqc_summary.txt"
+echo -e "Sample\tTotal_Sequences" > $SUMMARY_FILE
+
+for zip_file in results/fastqc/*_fastqc.zip
+do
+    sample_name=$(basename $zip_file _fastqc.zip)
+
+    total_seq=$(unzip -p $zip_file */fastqc_data.txt | grep "^Total Sequences" | awk '{print $3}')
+
+    echo -e "$sample_name\t$total_seq" >> $SUMMARY_FILE
+done
+
+echo "QC Summary saved to $SUMMARY_FILE"
