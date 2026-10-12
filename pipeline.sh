@@ -37,3 +37,25 @@ do
 done
 
 echo "QC Summary saved to $SUMMARY_FILE"
+
+
+#Task3
+echo "Aligning reads to genome"
+
+if [ ! -f "Tcongo_index.1.bt2" ]; then
+    echo "Building Bowtie2 index..."
+    gunzip -c $GENOME_FASTA > Tcongo_genome.fasta
+    bowtie2-build Tcongo_genome.fasta Tcongo_index
+fi
+
+tail -n +2 $SAMPLE_FILE | while read SampleName SampleType Replicate Time Treatment End1 End2
+do
+    echo "Processing sample: $SampleName"
+
+bowtie2 -x Tcongo_index \
+      -1 $FASTQ_DIR/$End1 \
+      -2 $FASTQ_DIR/$End2 \
+      | samtools view -bS - | samtools sort -o results/bam/${SampleName}.bam
+done
+
+echo "Alignment complete."
